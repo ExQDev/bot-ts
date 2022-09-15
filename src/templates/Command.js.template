@@ -1,0 +1,35 @@
+// @flow
+import type { Client, Guild, Message } from 'discord.js';
+import { MongoClient } from 'mongodb';
+import ICommand from '../types';
+import config from '../../config.json';
+
+class Command implements ICommand { 
+  bot : Client = null;
+  db: MongoClient = null;
+  channel : TextChannel = null;
+
+  init = (bot: Client, db: MongoClient) => {
+    if(!this.bot) this.bot = bot;
+    if(!this.db) this.db = db;
+  }
+
+  execute = (msg: Message) => {
+    return async (args: [String]) => {
+      this.channel = msg.channel;
+
+      // TODO: other stuff
+    }
+  }
+  
+  shortDescription = () => {
+    return 'Sample command';
+  }
+
+  detailedDescription = () => {
+    return 'Detailed sample command';
+  }
+}
+
+
+export default Command;

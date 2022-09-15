@@ -1,0 +1,6 @@
+/.env
+/ffmpeg-4.4-full_build
+node_modules
+dist
+src/api/methods/getguilds.ts
+src/api/methods/getownguilds.ts
