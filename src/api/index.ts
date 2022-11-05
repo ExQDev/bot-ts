@@ -23,6 +23,8 @@ import signin from './methods/signin';
 import generateInvite from './methods/generateInvite';
 import getGreets from './methods/getGreets';
 import setGreets from './methods/setGreets';
+import setAutochannel from './methods/setAutochannel';
+import getAutochannel from './methods/getAutochannel';
 
 export default { 
   auth,
@@ -49,5 +51,7 @@ export default {
   m_stop,
   m_next,
   m_seek,
-  getsoundtrack
+  getsoundtrack,
+  setAutochannel,
+  getAutochannel
 }

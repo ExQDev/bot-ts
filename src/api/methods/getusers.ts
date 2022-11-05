@@ -19,6 +19,8 @@ export default async function getusers({ db, user, guildId, bot }: CallbackProps
   
   const dsguild = await bot.guilds.fetch(guildId)
   
+  // console.log('dbguild', dbguild)
+
   if(!dbguild || !dsguild)
     return [ 'error', `I'm not at this guild` ]
 
@@ -37,10 +39,11 @@ export default async function getusers({ db, user, guildId, bot }: CallbackProps
     })
   })
 
+  // console.log('users', users)
   
   const latteusers = (await (await db.collection('users').find({
     id: {
-      $in: dbusers.map((dbu: any) => dbu.id)
+      $in: users.map((dbu: any) => dbu.user.id)
     }
   })).toArray()).map(user => user.id)
 

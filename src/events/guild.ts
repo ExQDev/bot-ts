@@ -3,9 +3,97 @@ import type { ArgsOf, Client } from "discordx";
 import { Discord, On } from "discordx";
 import { Guild } from "@/types";
 import cmds from '../commands'
+import wire from '../utils/wire'
+import { ChannelType } from "discord.js";
 
+// console = wire
 @Discord()
 export class Guilds {
+
+  @On('voiceStateUpdate')
+  async onVoiceStateUpdate([oldState, newState]: ArgsOf<'voiceStateUpdate'>, client: Client): Promise<void> {
+    // wire.log('voice state changed', oldState, newState)
+    if (oldState.member?.user.bot) return;
+
+    const guild = await connection.collection('guilds').findOne({
+      id: newState.guild.id
+    })
+
+    if (!guild) return;
+
+    const { autochannel } = guild
+
+    if (newState.channel?.name === autochannel.name) {
+      // Join
+      if (newState.member && newState.channel?.members.some(member => member.id === newState.member?.id)) {
+        const newChannelName = newState.member?.nickname + '\'s channel'
+        const newVoiceChannel = await newState.guild.channels.create({
+          name: newChannelName,
+          type: ChannelType.GuildVoice,
+          parent: newState.channel?.parent
+        })
+        const list = autochannel.list || []
+        const newAutochannel = {
+          ...autochannel,
+          list: [
+            ...list,
+            newChannelName
+          ]
+        }
+          /* @ts-ignore */
+        const updatedCb = (await connection.collection('guilds').findOneAndUpdate({
+          id: newState.guild.id
+        }, {
+          $set: {
+            autochannel: newAutochannel
+          }
+        }, {
+          returnOriginal: false,
+          returnDocument: true
+        }))
+  
+        /* @ts-ignore */
+        if (updatedCb && updatedCb.ok === 1) {
+          newState.member?.voice.setChannel(newVoiceChannel, 'Created personal channel')
+        }
+      }
+    } else if (autochannel.list && autochannel.list.includes(oldState.channel?.name)) {
+      wire.log('Not the autochannel')
+      // Left last
+
+      if (!newState.channel && oldState.channel && oldState.channel.members.size === 0) {
+        const oldChannelName = oldState.channel?.name
+        await oldState.channel.delete();
+        const newAutochannel = {
+          ...autochannel,
+          list: autochannel.list.filter((c:string) => c !== oldChannelName)
+        }
+
+        // wire.log('newAutochannel', newAutochannel)
+        
+        /* @ts-ignore */
+        const updatedCb = (await connection.collection('guilds').findOneAndUpdate({
+          id: newState.guild.id
+        }, {
+          $set: {
+            autochannel: newAutochannel
+          }
+        }, {
+          returnOriginal: false,
+          returnDocument: true
+        }))
+
+        /* @ts-ignore */
+        // wire.log(updatedCb.ok)
+      }
+    }
+    // let guildDb = connection.collection('guilds').findOne({ id: guild.id })
+    // if ()
+  
+    // console.log(guildDB)
+    // console.log("Message Deleted", client.user?.username, message.content);
+  }
+
   @On('guildCreate')
   async onGuildCreate([guild]: ArgsOf<'guildCreate'>, client: Client): Promise<void> {
     console.log('create', guild)

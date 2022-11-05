@@ -261,6 +261,7 @@ async function run() {
       // console.log('__>USER:', payload.user)
       const requireAuth = [
         'getGuilds',
+        'getOwnGuilds',
         'getTriggers',
         'getChannels',
         'gettrack',

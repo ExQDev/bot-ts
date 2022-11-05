@@ -35,7 +35,7 @@ export default async function auth_discord({ db, user, accessToken, tokenType }:
     console.error('Please provide accessToken and its type')
     return
   }
-  // console.log('Oauth callback', accessToken)
+  console.log('Oauth callback', accessToken)
   const incomeUser: AuthUser = await getUser(accessToken, tokenType);
   // console.log(incomeUser)
   const updatedUser = (await db.collection('users').updateOne({

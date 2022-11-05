@@ -204,6 +204,13 @@ export type CallbackProps = {
   greets?: any
   prefix?: string
   setuser?: User
+  autochannel?: AutoChannel
+}
+
+export type AutoChannel = {
+  enabled: boolean
+  name: string | null
+  list: string[]
 }
 
 interface ServerToClientEvents {
